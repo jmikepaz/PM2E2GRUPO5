@@ -139,8 +139,6 @@ private void BusquedadPersonalizada(String dato){
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;
 
-                List<Modelo> mLista = new ArrayList<>();
-                ListAdapter mAdapter;
 
                 for (int i = 0; i < response.length(); i++) {
                     try {
@@ -153,7 +151,7 @@ private void BusquedadPersonalizada(String dato){
                         modelo.setUrl(jsonObject.getString("url_foto"));
 
                         mLista.add(modelo);
-                         //Toast.makeText(getApplicationContext(),jsonObject.getString("id_usuario"), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),jsonObject.getString("id_usuario"), Toast.LENGTH_SHORT).show();
 
                         mAdapter = new ListAdapter(getApplicationContext(), R.layout.item_row, mLista);
 

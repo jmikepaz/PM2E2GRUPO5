@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         tvlongitud = findViewById(R.id.txtlongitud);
 
 
-        //permisosUbicacion();
-        //DatosUbicacion();
-        otro();
+        permisosUbicacion();
+        DatosUbicacion();
+        //otro();
 
 
         findViewById(R.id.btnlistado).setOnClickListener(new View.OnClickListener() {
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 GaleriaImagenes();
+
             }
         });
 
@@ -114,7 +115,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //permisosUbicacion();
+                DatosUbicacion();
+                otro();
+            }
+        });
+
     }
+
 
 
     private void GaleriaImagenes()
@@ -215,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             //Toast.makeText(getApplicationContext(),"",Toast.LENGTH_SHORT).show();
-            permisosUbicacion();
+            //permisosUbicacion();
 
-            //return;
+            return;
         }else
         {
             LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
