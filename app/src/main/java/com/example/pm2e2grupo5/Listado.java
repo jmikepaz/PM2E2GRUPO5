@@ -36,18 +36,20 @@ public class Listado extends AppCompatActivity implements AdapterView.OnItemClic
     private ListView mlistView;
     ListAdapter mAdapter;
     EditText txtBuscador;
-    public static int resultado=1;
+    public static int resultado = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listado);
 
-        mlistView = (ListView) findViewById(R.id.mlistView);
-        txtBuscador = (EditText)findViewById(R.id.txtBuscador);
-        mlistView.setOnItemClickListener(this);
-        buscarProductos();
+        getSupportActionBar().hide();
 
+        mlistView = (ListView) findViewById(R.id.mlistView);
+        txtBuscador = (EditText) findViewById(R.id.txtBuscador);
+        mlistView.setOnItemClickListener(this);
+
+        BusquedadPersonalizada("");
 
         findViewById(R.id.main_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,18 +67,17 @@ public class Listado extends AppCompatActivity implements AdapterView.OnItemClic
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-              //a
-                //BusquedadPersonalizada(s.toString());
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                //Toast.makeText(getApplicationContext(),"sa",Toast.LENGTH_SHORT).show();
 
-                if(s.toString().trim().length()==0){
-                    //buscarProductos();
-                }else{
-                    //BusquedadPersonalizada(s.toString());
+
+                if (s.toString().trim().length() == 0) {
+                    BusquedadPersonalizada("");
+                } else {
+                    BusquedadPersonalizada(s.toString());
                 }
 
 
@@ -84,53 +85,52 @@ public class Listado extends AppCompatActivity implements AdapterView.OnItemClic
         });
     }
 
-private void BusquedadPersonalizada(String dato){
-    String url = "http://192.168.1.8/examen/busquedad_usuario.php?nombre="+dato+"";
-    JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
-        @Override
-        public void onResponse(JSONArray response) {
-            JSONObject jsonObject = null;
+    private void BusquedadPersonalizada(String dato) {
+        String url = "http://167.99.158.191/examen/api/search_usuarios.php?texto=" + dato + "";
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
 
-             List<Modelo> mLista = new ArrayList<>();
-            ListAdapter mAdapter;
+                 mLista = new ArrayList<>();
+                //ListAdapter mAdapter;
 
-            for (int i = 0; i < response.length(); i++) {
-                try {
-                    jsonObject = response.getJSONObject(i);
-                    Modelo modelo = new Modelo();
-                    modelo.setId(jsonObject.getString("id_usuario"));
-                    modelo.setNombre(jsonObject.getString("nombre"));
-                    modelo.setLatitud(jsonObject.getString("latitud"));
-                    modelo.setLongitud(jsonObject.getString("longitud"));
-                    modelo.setUrl(jsonObject.getString("url_foto"));
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        jsonObject = response.getJSONObject(i);
+                        Modelo modelo = new Modelo();
+                        modelo.setId(jsonObject.getString("id_usuario"));
+                        modelo.setNombre(jsonObject.getString("nombre"));
+                        modelo.setTelefono(jsonObject.getString("telefono"));
+                        modelo.setLatitud(jsonObject.getString("latitud"));
+                        modelo.setLongitud(jsonObject.getString("longitud"));
+                        modelo.setUrl(jsonObject.getString("url_foto"));
 
-                    mLista.add(modelo);
-                    //Toast.makeText(getApplicationContext(),jsonObject.getString("id_usuario"), Toast.LENGTH_SHORT).show();
+                        mLista.add(modelo);
 
 
-                    mAdapter = new ListAdapter(getApplicationContext(), R.layout.item_row, mLista);
+                        mAdapter = new ListAdapter(getApplicationContext(), R.layout.item_row, mLista);
 
-                    mlistView.setAdapter(mAdapter);
+                        mlistView.setAdapter(mAdapter);
 
-                } catch (JSONException e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
+
+
             }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "Error de conexion al buscar", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-
-
-        }
-    }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Toast.makeText(getApplicationContext(), "Error de conexion al buscar", Toast.LENGTH_SHORT).show();
-        }
-    });
-
-    RequestQueue requestQueue = Volley.newRequestQueue(this);
-    requestQueue.add(jsonArrayRequest);
-}
-
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonArrayRequest);
+    }
+/*
     private void buscarProductos(){
 
         String url = "http://167.99.158.191/examen/api/get_usuarios.php";
@@ -177,16 +177,21 @@ private void BusquedadPersonalizada(String dato){
         requestQueue.add(jsonArrayRequest);
     }
 
+
+ */
+
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        Intent intent = new Intent(getApplicationContext(),SegundoActividad.class);
+        Intent intent = new Intent(getApplicationContext(), SegundoActividad.class);
         intent.putExtra("id", mLista.get(position).getId());
         intent.putExtra("nombre", mLista.get(position).getNombre());
+        intent.putExtra("telefono", mLista.get(position).getTelefono());
         intent.putExtra("url", mLista.get(position).getUrl());
         intent.putExtra("latitud", mLista.get(position).getLatitud());
         intent.putExtra("longitud", mLista.get(position).getLongitud());
-         startActivityForResult(intent,resultado);
+        startActivityForResult(intent, resultado);
 
 
     }
@@ -196,7 +201,8 @@ private void BusquedadPersonalizada(String dato){
 
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == resultado && requestCode == RESULT_OK) {
-            buscarProductos();
+            BusquedadPersonalizada("");
+            txtBuscador.setText("");
         }
     }
 

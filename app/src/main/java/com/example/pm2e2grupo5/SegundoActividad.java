@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,25 +32,33 @@ public class SegundoActividad extends AppCompatActivity {
     String url ;
     String latitud ;
     String longitud;
+    String telefono;
+
+    public static int resultado = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segundo_actividad);
 
-        ImageView imagenSecond = (ImageView)findViewById(R.id.imageView2);
-        TextView caja = (TextView)findViewById(R.id.caja);
+        getSupportActionBar().hide();
+
+        ImageView imagenSecond = (ImageView) findViewById(R.id.imageView2);
+        TextView caja = (TextView) findViewById(R.id.caja);
 
         Intent intent = getIntent();
-         id = intent.getStringExtra("id");
-         nombre = intent.getStringExtra("nombre");
-         url = intent.getStringExtra("url");
-         latitud = intent.getStringExtra("latitud");
-         longitud = intent.getStringExtra("longitud");
+        id = intent.getStringExtra("id");
+        nombre = intent.getStringExtra("nombre");
+        url = intent.getStringExtra("url");
+        telefono = intent.getStringExtra("telefono");
+
+        latitud = intent.getStringExtra("latitud");
+        longitud = intent.getStringExtra("longitud");
 
         String texto = "Informacion personal\n\n"+
                 "ID: "+id + "\n"+
                 "Nombre: "+nombre + "\n"+
+                "Telefono: "+telefono + "\n"+
                 "Latitud: "+latitud + "\n"+
                 "Longitud: "+longitud + "\n";
 
@@ -61,15 +70,26 @@ public class SegundoActividad extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Eliminar();
-                Intent list = new Intent(getApplicationContext(),Listado.class);
-                startActivity(list);
+
             }
         });
 
         findViewById(R.id.btnActu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Actualizar.class);
 
+
+                Actualizar.setId(id);
+                Actualizar.setLatitud(latitud);
+                Actualizar.setLongitud(longitud);
+                Actualizar.setNombre1(nombre);
+                Actualizar.setTelefono(telefono);
+                Actualizar.setUrl(url);
+
+
+
+                startActivityForResult(intent,resultado);
             }
         });
 
@@ -80,6 +100,17 @@ public class SegundoActividad extends AppCompatActivity {
                 MapaActividad.setLatitud_map(Double.parseDouble(latitud));
                 MapaActividad.setLongitud_map(Double.parseDouble(longitud));
                 startActivity(list);
+            }
+        });
+
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String geoUri = "http://maps.google.com/maps?q=loc:" + latitud + "," + longitud + " (" + "Destino" + ")";
+                Uri location = Uri.parse(geoUri);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, location);
+                startActivity(mapIntent);
             }
         });
 
@@ -119,7 +150,8 @@ public class SegundoActividad extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Toast.makeText(getApplicationContext(),"Se ha Eliminado exitosamente",Toast.LENGTH_SHORT).show();
-
+                        Intent list = new Intent(getApplicationContext(),Listado.class);
+                        startActivity(list);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -135,7 +167,15 @@ public class SegundoActividad extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == resultado && requestCode == RESULT_OK) {
+
+
+        }
+    }
 
 
 

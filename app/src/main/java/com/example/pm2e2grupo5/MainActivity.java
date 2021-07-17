@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -30,7 +29,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -38,20 +36,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageView =findViewById(R.id.imageView);
+        getSupportActionBar().hide();
+
+        imageView =findViewById(R.id.ivactu);
         nombre = findViewById(R.id.txtNombre);
         numero = findViewById(R.id.txtNumero);
         tvlatitud = findViewById(R.id.txtlatitud);
@@ -107,22 +102,50 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnsalvar).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(photo!= null){
-                    Crear();
-                }else{
-                    if(nombre.getText().toString().trim().length()==0){
+                if (photo != null) {
+
+
+                    if (nombre.getText().toString().trim().length() == 0) {
                         nombre.setError("Este campo es obligatorio");
-                    }else{
+
+                    } else {
+                        nombre.setError(null);
+                        if (numero.getText().toString().trim().length() == 0) {
+                            numero.setError("Este campo es obligatorio");
+                        } else {
+                            numero.setError(null);
+                            if (numero.getText().toString().length() >= 11) {
+                                numero.setError("No se puede poner mayor de 11 cracteres");
+                            } else {
+                                numero.setError(null);
+                                Crear();
+                            }
+                        }
+
+                    }
+
+
+                } else {
+                    if (nombre.getText().toString().trim().length() == 0) {
+                        nombre.setError("Este campo es obligatorio");
+                    } else {
                         nombre.setError(null);
                     }
 
-                    if(numero.getText().toString().trim().length()==0){
+                    if (numero.getText().toString().trim().length() == 0) {
                         numero.setError("Este campo es obligatorio");
-                    }else{
+                    } else {
                         numero.setError(null);
                     }
 
-                    AlertaDialogo("Seleccione la imagen por favor","Imagen no seleccionada");
+                    if (numero.getText().toString().length()  >=  11 ) {
+                        numero.setError("No se puede poner mayor de 8 cracteres");
+                    } else {
+                        numero.setError(null);
+                    }
+
+
+                    AlertaDialogo("Seleccione la imagen por favor", "Imagen no seleccionada");
                 }
             }
         });
@@ -364,7 +387,9 @@ public class MainActivity extends AppCompatActivity {
             String Text = "Mi ubicacion actual es: " + "\n Lat = "
                     + loc.getLatitude() + "\n Long = " + loc.getLongitude();
 
-            //MainActivity.setLatitud(loc.getLatitude());
+
+            MainActivity.setLatitud(loc.getLatitude()+"");
+            MainActivity.setLongitud(loc.getLongitude()+"");
             tvlatitud.setText(loc.getLatitude()+"");
             tvlongitud.setText(loc.getLongitude()+"");
             this.mainActivity.setLocation(loc);
